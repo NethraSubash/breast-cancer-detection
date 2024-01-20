@@ -1,0 +1,41 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+# Input data files are available in the read-only "../input/" directory
+# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
+
+import os
+for dirname, _, filenames in os.walk('/content/breast-cancer.csv'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+df = pd.read_csv('/kaggle/input/breast-cancer-dataset/breast-cancer.csv')
+df.head()
+
+X = df.drop(['diagnosis','id'],axis = 1 )
+y = df['diagnosis']
+
+import sklearn
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.3)
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_train_normalised = scaler.fit_transform(X_train)
+  
+from sklearn.linear_model import LogisticRegression
+model = LogisticRegression()
+model.fit(X_train_normalised,y_train)
+
+X_test_normalised = scaler.transform(X_test)
+yhat = model.predict(X_test_normalised)
+
+y_test = y_test.to_numpy()
+
+m = y_test.shape[0]
+incorrect = 0
+for i in range(m):
+    if(yhat[i] != y_test[i]):
+        incorrect += 1
+    cerr = incorrect/m
+print(f'the classification error is: {cerr}')  
